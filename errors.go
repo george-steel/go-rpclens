@@ -1,6 +1,7 @@
 package rpclens
 
 import (
+	"context"
 	"encoding/json/v2"
 	"errors"
 	"fmt"
@@ -21,7 +22,7 @@ type ProblemType struct {
 
 // ProbemType for an HTTP status code with no further specificity.
 func ProblemStatus(status int) ProblemType {
-	var logLevel slog.Level = slog.LevelDebug
+	var logLevel slog.Level = slog.LevelInfo
 	if status == 502 {
 		logLevel = slog.LevelWarn
 	} else if status == 403 {
@@ -87,6 +88,11 @@ func (p *ProblemJSON) WriteHTTPResponse(w http.ResponseWriter) error {
 
 	_, err := w.Write(body)
 	return err
+}
+
+func LogProblem(ctx context.Context, log *slog.Logger, p Problem) {
+	ptype := p.ProblemType()
+	log.Log(ctx, ptype.LogLevel, p.Error(), "problem_type", ptype.Title)
 }
 
 type BasicProblem struct {
