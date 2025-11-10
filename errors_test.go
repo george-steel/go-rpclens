@@ -5,6 +5,7 @@ import (
 	"testing"
 )
 
+// sanity check to make sure nothing panics and that it logs correct JSON
 func TestProblemJSON(t *testing.T) {
 	badRequest := ProblemStatus(400)
 	innerErr := fmt.Errorf("sample parse error foo")

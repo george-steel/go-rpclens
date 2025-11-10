@@ -39,7 +39,7 @@ func ProblemStatus(status int) ProblemType {
 }
 
 // Am error message that can be returned from an HTTPP API.
-// Follows RFC7807 structure.
+// Follows RFC9457 structure.
 type Problem interface {
 	error                                      // allows this to be returned as an error as well as providing a log message through the Error() method
 	ProblemType() ProblemType                  // type of error including the status code
