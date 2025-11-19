@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-// Error type from RFC7807.
+// Error type from RFC 9457.
 // This extends an HTTP status code with an optional URI for further specificity.
 // Title is descriptive text but should be consistent for a given problem type.
 type ProblemType struct {
@@ -39,8 +39,8 @@ func ProblemStatus(status int) ProblemType {
 	}
 }
 
-// Am error message that can be returned from an HTTPP API.
-// Follows RFC9457 structure.
+// Am error message that can be returned from an HTTP API.
+// Follows RFC 9457 structure.
 type Problem interface {
 	error                                      // allows this to be returned as an error as well as providing a log message through the Error() method
 	ProblemType() ProblemType                  // type of error including the status code
@@ -133,7 +133,24 @@ func (p *BasicProblem) ErrorData() map[string]any {
 	return nil
 }
 
-func Problemf(ptype ProblemType, instance string, format string, args ...any) Problem {
+func Problemf(ptype ProblemType, format string, args ...any) Problem {
+	wrapper := fmt.Errorf(format, args...)
+	wrapped := errors.Unwrap(wrapper)
+	message := wrapper.Error()
+
+	return &BasicProblem{
+		PType:           ptype,
+		Detail:          message,
+		InternalMessage: message,
+		WrappedError:    wrapped,
+	}
+}
+
+func StatusProblemf(status int, format string, args ...any) Problem {
+	return Problemf(ProblemStatus(status), format, args...)
+}
+
+func InstancedProblemf(ptype ProblemType, instance string, format string, args ...any) Problem {
 	wrapper := fmt.Errorf(format, args...)
 	wrapped := errors.Unwrap(wrapper)
 	message := wrapper.Error()

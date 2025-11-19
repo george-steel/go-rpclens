@@ -13,25 +13,30 @@ type HTTPResponse interface {
 	WriteHTTPResponse(w http.ResponseWriter) error // the error should be ignorable if you do not care about dropped connections
 }
 
-type JSON[T any] struct {
-	Status int
-	Body   T
+type JSONBody[T any] struct {
+	Status       int
+	ExtraHeaders map[string]string
+	Body         T
 }
 
-func AsJSON[T any](body T) *JSON[T] {
-	return &JSON[T]{
-		Status: 200,
-		Body:   body,
+func AsJSONBody[T any](body T) *JSONBody[T] {
+	return &JSONBody[T]{
+		Status:       200,
+		ExtraHeaders: map[string]string{},
+		Body:         body,
 	}
 }
 
-func (r *JSON[T]) WriteHTTPResponse(w http.ResponseWriter) error {
+func (r *JSONBody[T]) WriteHTTPResponse(w http.ResponseWriter) error {
 	rawbody, err := json.Marshal(r.Body, JSONOptions)
 	if err != nil {
 		panic(fmt.Errorf("error marshalling JSON response: %w", err))
 	}
 
 	h := w.Header()
+	for k, v := range r.ExtraHeaders {
+		h.Set(k, v)
+	}
 	h.Set("Content-Type", "application/json")
 	h.Set("Content-Length", strconv.Itoa(len(rawbody)))
 
