@@ -55,12 +55,12 @@ func HandleJSONRequest[S any, T HTTPResponse](endpoint func(r *http.Request, bod
 	}
 }
 
-type BlankBodyHandler[S any, T HTTPResponse] struct {
+type EmptyBodyHandler[T HTTPResponse] struct {
 	Name         string
 	EndpointFunc func(r *http.Request, log *slog.Logger) (T, Problem)
 }
 
-func (h *BlankBodyHandler[S, T]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h *EmptyBodyHandler[T]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log := slog.Default().With("endpoint", h.Name)
 
 	resp, prob := h.EndpointFunc(r, log)
@@ -75,9 +75,9 @@ func (h *BlankBodyHandler[S, T]) ServeHTTP(w http.ResponseWriter, r *http.Reques
 	resp.WriteHTTPResponse(w)
 }
 
-func HandleBlankRequest[S any, T HTTPResponse](endpoint func(r *http.Request, body S, log *slog.Logger) (T, Problem)) http.Handler {
+func HandleEmptyRequest[T HTTPResponse](endpoint func(r *http.Request, log *slog.Logger) (T, Problem)) http.Handler {
 	name := getFuncName(endpoint)
-	return &JSONBodyHandler[S, T]{
+	return &EmptyBodyHandler[T]{
 		Name:         name,
 		EndpointFunc: endpoint,
 	}

@@ -47,12 +47,31 @@ func (r *JSONBody[T]) WriteHTTPResponse(w http.ResponseWriter) error {
 
 type NoContent struct{}
 
+// nil is a valid value here, as NoContent has no content
 func (r *NoContent) WriteHTTPResponse(w http.ResponseWriter) error {
 	h := w.Header()
 	h.Set("Content-Type", "application/json")
 	h.Set("Content-Length", "0")
 
 	w.WriteHeader(204)
+	return nil
+}
+
+type HeadersOnly struct {
+	Status  int
+	Headers map[string]string
+}
+
+// nil is a valid value here, as NoContent has no content
+func (r *HeadersOnly) WriteHTTPResponse(w http.ResponseWriter) error {
+	h := w.Header()
+	for k, v := range r.Headers {
+		h.Set(k, v)
+	}
+	h.Set("Content-Type", "application/json")
+	h.Set("Content-Length", "0")
+
+	w.WriteHeader(r.Status)
 	return nil
 }
 
