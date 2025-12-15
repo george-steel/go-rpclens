@@ -44,7 +44,7 @@ func ProblemStatus(status int) ProblemType {
 type Problem interface {
 	error                                      // allows this to be returned as an error as well as providing a log message through the Error() method
 	ProblemType() ProblemType                  // type of error including the status code
-	ProblemInstance() string                   // Optional URI to identify a specific instance of this problem, may be blank
+	ProblemInstance() string                   // Optional URI pointing to a persistent record of this occurrence of the problem.
 	ProblemDetail() string                     // Human-readable error message to be returned to the client
 	SetProblemHeaders(headers_out http.Header) // set any headers required for the response
 	ProblemData() map[string]any               // additional fields to be sent to the response, MUST be json/v2 serializable

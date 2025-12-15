@@ -25,6 +25,7 @@ type JSONBodyHandler[S any, T HTTPResponse] struct {
 }
 
 func (h *JSONBodyHandler[S, T]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// TODO: add X-Request-Id handling to logger
 	log := slog.Default().With("endpoint", h.Name)
 
 	body, prob := GetJSONBody[S](r)

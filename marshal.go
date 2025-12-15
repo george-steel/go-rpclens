@@ -107,7 +107,7 @@ func GetJSONBody[T any](r *http.Request) (T, Problem) {
 
 	err := json.UnmarshalRead(r.Body, &out, JSONOptions)
 	if err != nil {
-		return out, Problemf(ProblemStatus(400), "", "Error decoding JSON body: %w", err)
+		return out, Problemf(ProblemStatus(400), "Error decoding JSON body: %w", err)
 	}
 	return out, nil
 }
