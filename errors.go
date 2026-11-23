@@ -55,7 +55,7 @@ type problemJSONBody struct {
 	ProblemType
 	Instance       string         `json:"instance,omitempty"`
 	Detail         string         `json:"detail"`
-	AdditionalData map[string]any `json:",inline"`
+	AdditionalData map[string]any `json:",embed"`
 }
 
 type ProblemJSON struct {
