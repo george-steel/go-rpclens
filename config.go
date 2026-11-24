@@ -14,6 +14,7 @@ var JSONOptions json.Options = json.JoinOptions(
 	json.FormatNilMapAsNull(false),
 )
 
+// If set tu true, will make the Content-Type header optional in GetJSONBody
 // Incorrect Content-Type will always be rejected
 // (required to prevent XSRF which can send JSON as text/plain bypassing CORS),
 // but the header can be made optional.
