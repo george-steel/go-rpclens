@@ -11,7 +11,7 @@ func TestProblemJSON(t *testing.T) {
 	innerErr := fmt.Errorf("sample parse error foo")
 	sampleProblem := Problemf(badRequest, "invalid request: %w", innerErr)
 
-	jsonProblem := ProblemResponse{Prob: sampleProblem}
+	jsonProblem := ProblemResponseJSON{Prob: sampleProblem}
 	var _ HTTPResponse = &jsonProblem
 	rawbody := jsonProblem.RawBody()
 	t.Log(string(rawbody))

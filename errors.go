@@ -62,14 +62,15 @@ type problemJSONBody struct {
 }
 
 // Wrapper for Problem that can be returned as an HTTPResponse.
-// Follows RFC 9457 serialization and uses the application/problem+json MIME type.
+// Serializes as JSON following RFC 9457 structure and uses the application/problem+json MIME type.
 // Note that this serialization uses "detail" for the error message field and "instance" for the permalink.
-type ProblemResponse struct {
+// This returned by the default MakeProblemResponse
+type ProblemResponseJSON struct {
 	Prob Problem
 }
 
 // Serializes the Problem as JSON according to RFC 9457.
-func (p *ProblemResponse) RawBody() []byte {
+func (p *ProblemResponseJSON) RawBody() []byte {
 	bodyobj := problemJSONBody{
 		ProblemType:    p.Prob.ProblemType(),
 		Message:        p.Prob.ResponseMessage(),
@@ -85,13 +86,34 @@ func (p *ProblemResponse) RawBody() []byte {
 // Writes a Problem as an HTTP response.
 // Returns the errror from the Write call itself, which can be ignored if you don't care about dropped sockets.
 // Panics if ProblemData returns fields with non-serializable types.
-func (p *ProblemResponse) WriteHTTPResponse(w http.ResponseWriter) error {
+func (p *ProblemResponseJSON) WriteHTTPResponse(w http.ResponseWriter) error {
 	body := p.RawBody()
 
 	p.Prob.SetResponseHeaders(w.Header())
 	w.Header().Set("Content-Type", "application/problem+json")
 	w.Header().Set("Content-Length", strconv.Itoa(len(body)))
 	w.WriteHeader(p.Prob.ProblemType().Status)
+
+	_, err := w.Write(body)
+	return err
+}
+
+// Wrapper for Problem that can be returned as an HTTPResponse.
+// Serializes the type and error message as plain text without any extra fields.
+// For use with MakeProblemResponse as an alternate form.
+type ProblemResponseText struct {
+	Prob Problem
+}
+
+func (p *ProblemResponseText) WriteHTTPResponse(w http.ResponseWriter) error {
+	ptype := p.Prob.ProblemType()
+
+	body := []byte(ptype.Title + "\n" + p.Prob.ResponseMessage() + "\n")
+
+	p.Prob.SetResponseHeaders(w.Header())
+	w.Header().Set("Content-Type", "text/plain")
+	w.Header().Set("Content-Length", strconv.Itoa(len(body)))
+	w.WriteHeader(ptype.Status)
 
 	_, err := w.Write(body)
 	return err

@@ -31,16 +31,14 @@ func (h *JSONBodyHandler[S, T]) ServeHTTP(w http.ResponseWriter, r *http.Request
 	body, prob := GetJSONBody[S](r)
 	if prob != nil {
 		LogProblem(r.Context(), log, prob)
-		pj := &ProblemResponse{Prob: prob}
-		pj.WriteHTTPResponse(w)
+		MakeProblemResponse(prob).WriteHTTPResponse(w)
 		return
 	}
 
 	resp, prob := h.EndpointFunc(r, body, log)
 	if prob != nil {
 		LogProblem(r.Context(), log, prob)
-		pj := &ProblemResponse{Prob: prob}
-		pj.WriteHTTPResponse(w)
+		MakeProblemResponse(prob).WriteHTTPResponse(w)
 		return
 	}
 
@@ -67,8 +65,7 @@ func (h *EmptyBodyHandler[T]) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 	resp, prob := h.EndpointFunc(r, log)
 	if prob != nil {
 		LogProblem(r.Context(), log, prob)
-		pj := &ProblemResponse{Prob: prob}
-		pj.WriteHTTPResponse(w)
+		MakeProblemResponse(prob).WriteHTTPResponse(w)
 		return
 	}
 

@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-// Data which can be returned over the wire as an HTTP response.
+// Types which can be returned over the wire as an HTTP response.
 type HTTPResponse interface {
 	WriteHTTPResponse(w http.ResponseWriter) error // the error should be ignorable if you do not care about dropped connections
 }

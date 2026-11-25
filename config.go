@@ -19,3 +19,9 @@ var JSONOptions json.Options = json.JoinOptions(
 // (required to prevent XSRF which can send JSON as text/plain bypassing CORS),
 // but the header can be made optional.
 var AllowBlankContentType = false
+
+// Overrideable function to turn a returned Problem into an HTTPResponse.
+// The default value returns a ProblemResponseJSON which serializes as JSON using RFC 9457 conventions.
+var MakeProblemResponse func(p Problem) HTTPResponse = func(p Problem) HTTPResponse {
+	return &ProblemResponseJSON{Prob: p}
+}
