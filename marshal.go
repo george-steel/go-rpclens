@@ -50,6 +50,7 @@ func (r *JSONBody[T]) WriteHTTPResponse(w http.ResponseWriter) error {
 }
 
 // Simple 204 No Content response with no extra headers.
+// Pointers to this may be nil and still serialize.
 type NoContent struct{}
 
 // nil is a valid value here, as NoContent has no content
@@ -68,7 +69,6 @@ type HeadersOnly struct {
 	Headers map[string]string
 }
 
-// nil is a valid value here, as NoContent has no content
 func (r *HeadersOnly) WriteHTTPResponse(w http.ResponseWriter) error {
 	h := w.Header()
 	for k, v := range r.Headers {
